@@ -1,0 +1,3 @@
+rootProject.name = "NightModel"
+include ':app'
+include ':library'
