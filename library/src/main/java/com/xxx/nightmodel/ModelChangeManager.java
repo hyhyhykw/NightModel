@@ -1,8 +1,5 @@
 package com.xxx.nightmodel;
 
-import android.os.Looper;
-import android.os.MessageQueue;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,29 +20,34 @@ class ModelChangeManager {
     }
 
     void notifyChange(final boolean isNight) {
-        Looper.myQueue().addIdleHandler(new NotifyHandler(listeners, isNight));
-    }
-
-    static class NotifyHandler implements MessageQueue.IdleHandler {
-
-        List<ModelChangeListener> listeners;
-        boolean isNight;
-
-        NotifyHandler(List<ModelChangeListener> listeners, boolean isNight) {
-            this.listeners = listeners;
-            this.isNight = isNight;
-        }
-
-        @Override
-        public boolean queueIdle() {
-            if (listeners != null) {
-                for (ModelChangeListener listener:listeners) {
-                    listener.onNightModeChanged(isNight);
-                }
+        if (listeners != null) {
+            for (ModelChangeListener listener:listeners) {
+                listener.onNightModeChanged(isNight);
             }
-            return false;
         }
+//        Looper.myQueue().addIdleHandler(new NotifyHandler(listeners, isNight));
     }
+
+//    static class NotifyHandler implements MessageQueue.IdleHandler {
+//
+//        List<ModelChangeListener> listeners;
+//        boolean isNight;
+//
+//        NotifyHandler(List<ModelChangeListener> listeners, boolean isNight) {
+//            this.listeners = listeners;
+//            this.isNight = isNight;
+//        }
+//
+//        @Override
+//        public boolean queueIdle() {
+//            if (listeners != null) {
+//                for (ModelChangeListener listener:listeners) {
+//                    listener.onNightModeChanged(isNight);
+//                }
+//            }
+//            return false;
+//        }
+//    }
 
     static class Holder {
         static ModelChangeManager INSTANCE = new ModelChangeManager();
