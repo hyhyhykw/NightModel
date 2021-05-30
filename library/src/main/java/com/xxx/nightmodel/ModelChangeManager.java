@@ -1,30 +1,45 @@
 package com.xxx.nightmodel;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.ref.WeakReference;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * 管理夜间模式监听的回调
+ *
  * @author like
  */
 class ModelChangeManager {
 
-    List<ModelChangeListener> listeners = new ArrayList<>();
+    final Set<WeakReference<ModelChangeListener>> mReferences = new LinkedHashSet<>();
 
-    void addListener(ModelChangeListener listener){
-        listeners.add(listener);
+    void addListener(ModelChangeListener listener) {
+        mReferences.add(new WeakReference<>(listener));
     }
 
     void removeListener(ModelChangeListener listener) {
-        listeners.remove(listener);
+        Iterator<WeakReference<ModelChangeListener>> iterator = mReferences.iterator();
+
+        while (iterator.hasNext()) {
+            WeakReference<ModelChangeListener> reference = iterator.next();
+            if (reference.get() == listener) {
+                iterator.remove();
+            }
+        }
     }
 
     void notifyChange(final boolean isNight) {
-        if (listeners != null) {
-            for (ModelChangeListener listener:listeners) {
-                listener.onNightModeChanged(isNight);
+        Iterator<WeakReference<ModelChangeListener>> iterator = mReferences.iterator();
+        while (iterator.hasNext()) {
+            WeakReference<ModelChangeListener> weakReference = iterator.next();
+            if (weakReference.get() != null) {
+                weakReference.get().onNightModeChanged(isNight);
+            } else {
+                iterator.remove();
             }
         }
+
 //        Looper.myQueue().addIdleHandler(new NotifyHandler(listeners, isNight));
     }
 
